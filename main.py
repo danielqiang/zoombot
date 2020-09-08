@@ -1,6 +1,7 @@
 from zoombot.speech_to_text import SpeechToTextStream
 from zoombot.text_to_speech import TextToSpeechStream
 from zoombot.mitsuku import Mitsuku
+from zoombot.enums import Voices
 
 from contextlib import ExitStack
 from textwrap import fill
@@ -8,8 +9,12 @@ from textwrap import fill
 
 def main():
     with ExitStack() as stack:
+        # Female WaveNet, en-US
+        voice = Voices.WaveNet.EN_US_WAVENET_H.value
+
         stt_stream = stack.enter_context(SpeechToTextStream())
-        tts_stream = stack.enter_context(TextToSpeechStream())
+        tts_stream = stack.enter_context(TextToSpeechStream(language_code=voice.language_code,
+                                                            voice_name=voice.name))
         mitsuku = stack.enter_context(Mitsuku())
 
         print('ZoomBot initialized. Ready to go!')
