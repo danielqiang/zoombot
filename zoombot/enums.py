@@ -6,7 +6,7 @@ from google.cloud.texttospeech import SsmlVoiceGender
 
 __all__ = ['Voices']
 
-Voice = namedtuple('Type', ['language_code', 'name', 'gender', 'rate'])
+Voice = namedtuple('Voice', ['language_code', 'name', 'gender', 'rate'])
 
 
 class Voices:
@@ -294,7 +294,7 @@ def _format_enum(voice):
 
     member_name = '_'.join(name.upper().split('-'))
 
-    formatted = (f"{member_name} = Voice('{languages}', "
+    formatted = (f"{member_name} = {Voice.__name__}('{languages}', "
                  f"'{name}', SsmlVoiceGender.{gender.name}, {rate})")
     return formatted
 
