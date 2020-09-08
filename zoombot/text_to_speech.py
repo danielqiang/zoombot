@@ -1,6 +1,6 @@
 import pyaudio
 
-from google.cloud import texttospeech
+from google.cloud import texttospeech as tts
 
 from typing import Generator, List, Optional
 from .bases import AbstractStream, PyAudioStream
@@ -53,13 +53,13 @@ class TextToSpeechStream(AbstractStream):
     def __init__(self, device: str = None, encoding: int = DEFAULT_ENCODING_TTS,
                  language_code: str = 'en-US', voice_name: str = 'en-AU-Wavenet-B'):
         self._output_stream = OutputStream(device=device)
-        self._client = texttospeech.TextToSpeechClient()
+        self._client = tts.TextToSpeechClient()
 
-        self._voice = texttospeech.VoiceSelectionParams(
+        self._voice = tts.VoiceSelectionParams(
             {'language_code': language_code,
              'name': voice_name}
         )
-        self._audio_config = texttospeech.AudioConfig(
+        self._audio_config = tts.AudioConfig(
             {'audio_encoding': encoding}
         )
 
@@ -72,7 +72,7 @@ class TextToSpeechStream(AbstractStream):
     def _start_stream(self) -> Generator[None, Optional[str], None]:
         while True:
             message = yield
-            synthesis_input = texttospeech.SynthesisInput({'text': message})
+            synthesis_input = tts.SynthesisInput({'text': message})
             response = self._client.synthesize_speech(
                 input=synthesis_input,
                 voice=self._voice,
