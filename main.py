@@ -6,6 +6,10 @@ from zoombot.consts import Voices
 from contextlib import ExitStack
 from textwrap import fill
 
+# Google speech synthesis voice to use.
+# Female WaveNet, en-US
+VOICE = Voices.WaveNet.EN_US_WAVENET_H
+
 
 def sequence_diff(s1: str, s2: str):
     from difflib import SequenceMatcher
@@ -20,11 +24,29 @@ def sequence_diff(s1: str, s2: str):
     return similarity
 
 
-def main():
+def talk():
     with ExitStack() as stack:
-        # Female WaveNet, en-US
-        voice = Voices.WaveNet.EN_US_WAVENET_H
+        stt_stream = stack.enter_context(SpeechToTextStream())
+        tts_stream = stack.enter_context(
+            TextToSpeechStream(
+                language_code=VOICE.language_code,
+                voice_name=VOICE.name
+            )
+        )
+        mitsuku = stack.enter_context(Mitsuku())
 
+        print('ZoomBot initialized. Ready to go!')
+        print('=' * 40)
+
+        for message in stt_stream:
+            print(f'Daniel: {fill(message, subsequent_indent=" " * 8)}')
+            response = mitsuku.send(message)
+            print(f'ZoomBot: {fill(response, subsequent_indent=" " * 9)}')
+            tts_stream.write(response)
+
+
+def zoom():
+    with ExitStack() as stack:
         vb_cable_input = 'CABLE Input (VB-Audio Virtual C'
         vb_cable_output = 'CABLE Output (VB-Audio Virtual '
 
@@ -36,8 +58,8 @@ def main():
         tts_stream = stack.enter_context(
             TextToSpeechStream(
                 device=vb_cable_input,
-                language_code=voice.language_code,
-                voice_name=voice.name
+                language_code=VOICE.language_code,
+                voice_name=VOICE.name
             )
         )
         mitsuku = stack.enter_context(Mitsuku())
@@ -57,6 +79,11 @@ def main():
             prev_response = response
             print(f'ZoomBot: {fill(response, subsequent_indent=" " * 9)}')
             tts_stream.write(response)
+
+
+def main():
+    talk()
+    # zoom()
 
 
 if __name__ == '__main__':

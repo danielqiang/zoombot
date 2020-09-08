@@ -113,7 +113,6 @@ class RecordingStream(PyAudioStream):
 
 
 class OutputStream(PyAudioStream):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
