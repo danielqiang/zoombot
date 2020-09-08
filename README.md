@@ -1,6 +1,6 @@
 # zoombot
 **zoombot** is a chatbot that can talk to meeting participants on [Zoom](https://zoom.us/) 
-in real time via voice (no chat messaging!). It leverages Google Cloud's 
+in real time via voice (no chat messaging necessary). It leverages Google Cloud's 
 [speech synthesis](https://cloud.google.com/text-to-speech) 
 and [speech recognition](https://cloud.google.com/speech-to-text) APIs, along 
 with state-of-the-art chatbot [Mitsuku](https://www.pandorabots.com/mitsuku/) 
