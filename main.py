@@ -17,8 +17,8 @@ def sequence_diff(s1: str, s2: str):
 
     # remove punctuation, casing and leading/trailing whitespace
     trans_table = str.maketrans('', '', punctuation)
-    s1 = s1.lower().strip().translate(trans_table)
-    s2 = s2.lower().strip().translate(trans_table)
+    s1 = s1.translate(trans_table).lower().strip()
+    s2 = s2.translate(trans_table).lower().strip()
 
     similarity = SequenceMatcher(None, s1, s2).ratio()
     return similarity
