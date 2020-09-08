@@ -5,10 +5,15 @@ from google.cloud import texttospeech as tts
 from google.cloud.speech import types
 from google.api_core.exceptions import GoogleAPIError
 
-from typing import Generator, Any, Optional
+from typing import Generator
 from .bases import AbstractStream
 from .audio import RecordingStream, PlaybackStream
-from .consts import DEFAULT_ENCODING_STT, DEFAULT_RATE, DEFAULT_ENCODING_TTS, Voices
+from .consts import (
+    DEFAULT_ENCODING_STT,
+    DEFAULT_RATE,
+    DEFAULT_ENCODING_TTS,
+    Voices,
+)
 
 __all__ = ["SpeechToTextStream", "TextToSpeechStream"]
 logger = logging.getLogger(__name__)
@@ -26,7 +31,9 @@ class SpeechToTextStream(AbstractStream):
         *args,
         **kwargs
     ):
-        self._input_stream = RecordingStream(device=input_device, *args, **kwargs)
+        self._input_stream = RecordingStream(
+            device=input_device, *args, **kwargs
+        )
         self._client = speech.SpeechClient()
 
         recognition_config = types.RecognitionConfig(
@@ -36,20 +43,23 @@ class SpeechToTextStream(AbstractStream):
             enable_automatic_punctuation=punctuation,
         )
         stream_config = types.StreamingRecognitionConfig(
-            config=recognition_config, interim_results=interim_results
+            config=recognition_config,
+            interim_results=interim_results,
         )
         self._config = stream_config
 
     @property
-    def stream(self) -> Generator[str, Any, None]:
+    def stream(self) -> Generator[str, None, None]:
         return super().stream
 
-    def _start_stream(self) -> Generator[str, Any, None]:
+    def _start_stream(self) -> Generator[str, None, None]:
         requests = (
             types.StreamingRecognizeRequest(audio_content=data)
             for data in self._input_stream
         )
-        stream = self._client.streaming_recognize(self._config, requests)
+        stream = self._client.streaming_recognize(
+            self._config, requests
+        )
 
         for response in stream:
             try:
@@ -72,24 +82,30 @@ class TextToSpeechStream(AbstractStream):
         *args,
         **kwargs
     ):
-        self._output_stream = PlaybackStream(device=output_device, *args, **kwargs)
+        self._output_stream = PlaybackStream(
+            device=output_device, *args, **kwargs
+        )
         self._client = tts.TextToSpeechClient()
 
         self._voice = tts.VoiceSelectionParams(
             {"language_code": language_code, "name": voice_name}
         )
-        self._audio_config = tts.AudioConfig({"audio_encoding": encoding})
+        self._audio_config = tts.AudioConfig(
+            {"audio_encoding": encoding}
+        )
 
         self.stream.send(None)
 
     @property
-    def stream(self) -> Generator[None, Optional[str], None]:
+    def stream(self) -> Generator[None, str, None]:
         return super().stream
 
-    def _start_stream(self) -> Generator[None, Optional[str], None]:
+    def _start_stream(self) -> Generator[None, str, None]:
         while True:
             message = yield
-            synthesis_input = tts.SynthesisInput({"text": message})
+            synthesis_input = tts.SynthesisInput(
+                {"text": message}
+            )
             response = self._client.synthesize_speech(
                 input=synthesis_input,
                 voice=self._voice,

@@ -2,7 +2,7 @@ import pyaudio
 import threading
 
 from abc import abstractmethod
-from typing import Generator, List, Any, Optional
+from typing import Generator, List
 from .consts import DEFAULT_RATE, DEFAULT_CHUNK, DEFAULT_SAMPLE_RATE
 from .bases import AbstractStream
 
@@ -22,7 +22,8 @@ class PyAudioStream(AbstractStream):
         self.sample_rate = sample_rate
 
         self._pa = pyaudio.PyAudio()
-        self._pa_stream = None  # pyaudio.Stream object, initialized in open()
+        # pyaudio.Stream object, initialized in _open_pa_stream()
+        self._pa_stream = None
 
         self.is_open = False
 
@@ -47,7 +48,7 @@ class PyAudioStream(AbstractStream):
         # Must initialize self._pa_stream
         raise NotImplementedError
 
-    def _all_devices(self) -> Generator[dict, Any, None]:
+    def _all_devices(self) -> Generator[dict, None, None]:
         for i in range(self._pa.get_device_count()):
             yield self._pa.get_device_info_by_index(i)
 
@@ -88,7 +89,7 @@ class RecordingStream(PyAudioStream):
         ]
 
     @property
-    def stream(self) -> Generator[bytes, Any, None]:
+    def stream(self) -> Generator[bytes, None, None]:
         return super().stream
 
     def _write_buffer(self, in_data, frame_count, time_info, status_flags):
@@ -97,7 +98,7 @@ class RecordingStream(PyAudioStream):
             self._has_data.set()
         return None, pyaudio.paContinue
 
-    def _start_stream(self) -> Generator[bytes, Any, None]:
+    def _start_stream(self) -> Generator[bytes, None, None]:
         if self._pa_stream is None:
             self.open()
         while self.is_open:
@@ -138,10 +139,10 @@ class PlaybackStream(PyAudioStream):
         ]
 
     @property
-    def stream(self) -> Generator[None, Optional[bytes], None]:
+    def stream(self) -> Generator[None, bytes, None]:
         return super().stream
 
-    def _start_stream(self) -> Generator[None, Optional[bytes], None]:
+    def _start_stream(self) -> Generator[None, bytes, None]:
         if self._pa_stream is None:
             self.open()
         while self.is_open:

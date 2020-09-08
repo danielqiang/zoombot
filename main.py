@@ -1,22 +1,9 @@
-from zoombot.cloud import SpeechToTextStream, TextToSpeechStream
+from zoombot.streams import SpeechToTextStream, TextToSpeechStream
 from zoombot.mitsuku import Mitsuku
 from zoombot.consts import Voices
 
 from contextlib import ExitStack
 from textwrap import fill
-
-
-def sequence_diff(s1: str, s2: str):
-    from difflib import SequenceMatcher
-    from string import punctuation
-
-    # remove punctuation, casing and leading/trailing whitespace
-    trans_table = str.maketrans("", "", punctuation)
-    s1 = s1.translate(trans_table).lower().strip()
-    s2 = s2.translate(trans_table).lower().strip()
-
-    similarity = SequenceMatcher(None, s1, s2).ratio()
-    return similarity
 
 
 def talk():
@@ -38,6 +25,19 @@ def talk():
             response = mitsuku.send(message)
             print(f'ZoomBot: {fill(response, subsequent_indent=" " * 9)}')
             tts_stream.write(response)
+
+
+def _sequence_diff(s1: str, s2: str):
+    from difflib import SequenceMatcher
+    from string import punctuation
+
+    # remove punctuation, casing and leading/trailing whitespace
+    trans_table = str.maketrans("", "", punctuation)
+    s1 = s1.translate(trans_table).lower().strip()
+    s2 = s2.translate(trans_table).lower().strip()
+
+    similarity = SequenceMatcher(a=s1, b=s2).ratio()
+    return similarity
 
 
 def zoom():
@@ -65,7 +65,7 @@ def zoom():
             # ZoomBot currently echos when using VB Cable. If the message
             # is too similar to the previous response, assume it is an echo
             # and skip it.
-            if sequence_diff(prev_response, message) > 0.85:
+            if _sequence_diff(prev_response, message) > 0.85:
                 continue
             print(f'Daniel: {fill(message, subsequent_indent=" " * 8)}')
             response = mitsuku.send(message)

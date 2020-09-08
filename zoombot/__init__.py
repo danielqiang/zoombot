@@ -1,6 +1,6 @@
 from .bases import AbstractStream
 from .audio import PyAudioStream, RecordingStream, PlaybackStream
-from .cloud import SpeechToTextStream, TextToSpeechStream
+from .streams import SpeechToTextStream, TextToSpeechStream
 from .mitsuku import Mitsuku
 from .consts import *
 
