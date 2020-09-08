@@ -13,8 +13,12 @@ def main():
         voice = Voices.WaveNet.EN_US_WAVENET_H.value
 
         stt_stream = stack.enter_context(SpeechToTextStream())
-        tts_stream = stack.enter_context(TextToSpeechStream(language_code=voice.language_code,
-                                                            voice_name=voice.name))
+        tts_stream = stack.enter_context(
+            TextToSpeechStream(
+                language_code=voice.language_code,
+                voice_name=voice.name
+            )
+        )
         mitsuku = stack.enter_context(Mitsuku())
 
         print('ZoomBot initialized. Ready to go!')

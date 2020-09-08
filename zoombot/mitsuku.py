@@ -1,11 +1,15 @@
+import logging
 import requests
 import bs4
 
+from . import retry
+
 __all__ = ['Mitsuku']
+logger = logging.getLogger(__name__)
 
 
 class Mitsuku:
-    """Unofficial API for Mitsuku chatbot
+    """Unofficial API wrapper for Mitsuku chatbot
     on Pandorabots."""
 
     _BOTKEY = ('n0M6dW2XZacnOgCWTp0FRYUuMjSfCkJGgobNpg'
@@ -32,6 +36,8 @@ class Mitsuku:
         name = f'kukilp-{ms:x}'
         return name
 
+    @retry.on_exception(requests.exceptions.RequestException,
+                        max_retries=3, logger=logger)
     def _send(self, message: str, session_id: int = None) -> dict:
         form_data = {
             'input': message,

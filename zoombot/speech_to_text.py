@@ -1,14 +1,17 @@
 import pyaudio
 import threading
+import logging
 
 from google.cloud import speech
 from google.cloud.speech import types
+from google.api_core.exceptions import GoogleAPIError
 
 from typing import Generator, Any, List
 from .bases import AbstractStream, PyAudioStream
 from .consts import DEFAULT_ENCODING_STT, DEFAULT_RATE
 
 __all__ = ['RecordingStream', 'SpeechToTextStream']
+logger = logging.getLogger(__name__)
 
 
 class RecordingStream(PyAudioStream):
@@ -64,8 +67,9 @@ class RecordingStream(PyAudioStream):
 class SpeechToTextStream(AbstractStream):
     def __init__(self, device: str = None, encoding: int = DEFAULT_ENCODING_STT,
                  rate: int = DEFAULT_RATE, interim_results=False,
-                 language_code='en-US', punctuation: bool = True):
-        self._input_stream = RecordingStream(device=device)
+                 language_code='en-US', punctuation: bool = True,
+                 *args, **kwargs):
+        self._input_stream = RecordingStream(device=device, *args, **kwargs)
         self._client = speech.SpeechClient()
 
         recognition_config = types.RecognitionConfig(
@@ -97,6 +101,8 @@ class SpeechToTextStream(AbstractStream):
                 yield best.transcript
             except IndexError:
                 pass
+            except GoogleAPIError as e:
+                logger.error(e)
 
 
 def main():

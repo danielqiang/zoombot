@@ -22,7 +22,8 @@ class OutputStream(PyAudioStream):
 
     def available_devices(self) -> List[dict]:
         return [device for device in self._all_devices()
-                if device['maxOutputChannels'] > 0]
+                if device['maxOutputChannels'] > 0 and
+                device['defaultSampleRate'] == self.sample_rate]
 
     @property
     def stream(self) -> Generator[None, Optional[bytes], None]:
@@ -51,8 +52,9 @@ class OutputStream(PyAudioStream):
 
 class TextToSpeechStream(AbstractStream):
     def __init__(self, device: str = None, encoding: int = DEFAULT_ENCODING_TTS,
-                 language_code: str = 'en-US', voice_name: str = 'en-AU-Wavenet-B'):
-        self._output_stream = OutputStream(device=device)
+                 language_code: str = 'en-US', voice_name: str = 'en-AU-Wavenet-B',
+                 *args, **kwargs):
+        self._output_stream = OutputStream(device=device, *args, **kwargs)
         self._client = tts.TextToSpeechClient()
 
         self._voice = tts.VoiceSelectionParams(
