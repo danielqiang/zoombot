@@ -10,12 +10,12 @@ in pure Python!
 Requires Python 3.7 or later.
 
 ## Dependencies
-#### Python
+### Python
 * [Google Cloud Speech-To-Text](https://pypi.org/project/google-cloud-speech/)
 * [Google Cloud Text-To-Speech](https://pypi.org/project/google-cloud-texttospeech/)
 * [PyAudio](https://pypi.org/project/PyAudio/)
 * [Requests](https://pypi.org/project/requests/)
 * [BeautifulSoup4](https://pypi.org/project/beautifulsoup4/)
 
-#### External
+### External
 * [VB Audio Virtual Cable](https://vb-audio.com/Cable/)
