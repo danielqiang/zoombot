@@ -50,7 +50,11 @@ class Mitsuku:
             "client_name": self.client_name,
         }
         headers = {"Referer": "https://www.pandorabots.com/mitsuku/"}
-        resp = self.session.post(self._ENDPOINT, headers=headers, data=form_data)
+        resp = self.session.post(
+            self._ENDPOINT,
+            headers=headers,
+            data=form_data
+        )
         return resp.json()
 
     def send(self, message: str):
@@ -58,7 +62,8 @@ class Mitsuku:
         soup = bs4.BeautifulSoup(response, "html.parser")
 
         # Extract text, ignore images
-        parts = [s for s in soup.text.split() if not s.startswith("http")]
+        parts = [s for s in soup.text.split()
+                 if not s.startswith("http")]
         return " ".join(parts)
 
 

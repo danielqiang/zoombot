@@ -1,14 +1,9 @@
-from zoombot.speech_to_text import SpeechToTextStream
-from zoombot.text_to_speech import TextToSpeechStream
+from zoombot.cloud import SpeechToTextStream, TextToSpeechStream
 from zoombot.mitsuku import Mitsuku
 from zoombot.consts import Voices
 
 from contextlib import ExitStack
 from textwrap import fill
-
-# Google speech synthesis voice to use.
-# Female WaveNet, en-US
-VOICE = Voices.WaveNet.EN_US_WAVENET_H
 
 
 def sequence_diff(s1: str, s2: str):
@@ -29,8 +24,8 @@ def talk():
         stt_stream = stack.enter_context(SpeechToTextStream())
         tts_stream = stack.enter_context(
             TextToSpeechStream(
-                language_code=VOICE.language_code,
-                voice_name=VOICE.name
+                language_code=Voices.DEFAULT.language_code,
+                voice_name=Voices.DEFAULT.name
             )
         )
         mitsuku = stack.enter_context(Mitsuku())
@@ -51,13 +46,13 @@ def zoom():
         vb_cable_output = "CABLE Output (VB-Audio Virtual "
 
         stt_stream = stack.enter_context(
-            SpeechToTextStream(device=vb_cable_output)
+            SpeechToTextStream(input_device=vb_cable_output)
         )
         tts_stream = stack.enter_context(
             TextToSpeechStream(
-                device=vb_cable_input,
-                language_code=VOICE.language_code,
-                voice_name=VOICE.name,
+                output_device=vb_cable_input,
+                language_code=Voices.DEFAULT.language_code,
+                voice_name=Voices.DEFAULT.name,
             )
         )
         mitsuku = stack.enter_context(Mitsuku())

@@ -269,6 +269,9 @@ class Voices:
         VI_VN_WAVENET_C = Voice("vi-VN", "vi-VN-Wavenet-C", Gender.FEMALE, 24000)
         VI_VN_WAVENET_D = Voice("vi-VN", "vi-VN-Wavenet-D", Gender.MALE, 24000)
 
+    # Female WaveNet default voice
+    DEFAULT = WaveNet.EN_US_WAVENET_H
+
 
 # Class variable generation for `Voices` class
 # using Google Cloud API

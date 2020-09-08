@@ -124,7 +124,6 @@ class PlaybackStream(PyAudioStream):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # prime output generator
         self.stream.send(None)
 
     def default_device(self) -> str:
