@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generator, Any
 
-__all__ = ['AbstractStream']
+__all__ = ["AbstractStream"]
 
 
 class AbstractStream(ABC):

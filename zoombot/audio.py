@@ -6,12 +6,17 @@ from typing import Generator, List, Any, Optional
 from .consts import DEFAULT_RATE, DEFAULT_CHUNK, DEFAULT_SAMPLE_RATE
 from .bases import AbstractStream
 
-__all__ = ['PyAudioStream', 'RecordingStream', 'OutputStream']
+__all__ = ["PyAudioStream", "RecordingStream", "PlaybackStream"]
 
 
 class PyAudioStream(AbstractStream):
-    def __init__(self, rate: int = DEFAULT_RATE, chunk: int = DEFAULT_CHUNK,
-                 sample_rate: int = DEFAULT_SAMPLE_RATE, device: str = None):
+    def __init__(
+        self,
+        rate: int = DEFAULT_RATE,
+        chunk: int = DEFAULT_CHUNK,
+        sample_rate: int = DEFAULT_SAMPLE_RATE,
+        device: str = None,
+    ):
         self.rate = rate
         self.chunk = chunk
         self.sample_rate = sample_rate
@@ -21,13 +26,13 @@ class PyAudioStream(AbstractStream):
 
         self.is_open = False
 
-        devices = {device['name']: device
+        devices = {device["name"]: device
                    for device in self.available_devices()}
         if (device is not None) and device not in devices:
-            raise ValueError(f'Could not find device: {device}')
+            raise ValueError(f"Could not find device: {device}")
         self.device = device or self.default_device()
         self.device_info = devices[self.device]
-        self._device_idx = devices[self.device]['index']
+        self._device_idx = devices[self.device]["index"]
 
     @abstractmethod
     def default_device(self) -> str:
@@ -72,12 +77,15 @@ class RecordingStream(PyAudioStream):
         self._has_data = threading.Event()
 
     def default_device(self) -> str:
-        return self._pa.get_default_input_device_info()['name']
+        return self._pa.get_default_input_device_info()["name"]
 
     def available_devices(self) -> List[dict]:
-        return [device for device in self._all_devices()
-                if device['maxInputChannels'] > 0 and
-                device['defaultSampleRate'] == self.sample_rate]
+        return [
+            device
+            for device in self._all_devices()
+            if device["maxInputChannels"] > 0
+            and device["defaultSampleRate"] == self.sample_rate
+        ]
 
     @property
     def stream(self) -> Generator[bytes, Any, None]:
@@ -98,7 +106,7 @@ class RecordingStream(PyAudioStream):
                 data = self._buffer
                 self._buffer = []
                 self._has_data.clear()
-            yield b''.join(data)
+            yield b"".join(data)
 
     def _open_pa_stream(self):
         self._pa_stream = self._pa.open(
@@ -108,11 +116,11 @@ class RecordingStream(PyAudioStream):
             input=True,
             input_device_index=self._device_idx,
             frames_per_buffer=self.chunk,
-            stream_callback=self._write_buffer
+            stream_callback=self._write_buffer,
         )
 
 
-class OutputStream(PyAudioStream):
+class PlaybackStream(PyAudioStream):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -120,12 +128,15 @@ class OutputStream(PyAudioStream):
         self.stream.send(None)
 
     def default_device(self) -> str:
-        return self._pa.get_default_output_device_info()['name']
+        return self._pa.get_default_output_device_info()["name"]
 
     def available_devices(self) -> List[dict]:
-        return [device for device in self._all_devices()
-                if device['maxOutputChannels'] > 0 and
-                device['defaultSampleRate'] == self.sample_rate]
+        return [
+            device
+            for device in self._all_devices()
+            if device["maxOutputChannels"] > 0
+            and device["defaultSampleRate"] == self.sample_rate
+        ]
 
     @property
     def stream(self) -> Generator[None, Optional[bytes], None]:
@@ -145,7 +156,7 @@ class OutputStream(PyAudioStream):
             rate=self.rate,
             output=True,
             output_device_index=self._device_idx,
-            frames_per_buffer=self.chunk
+            frames_per_buffer=self.chunk,
         )
 
     def write(self, data: bytes):

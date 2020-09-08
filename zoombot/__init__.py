@@ -1,5 +1,5 @@
 from .bases import AbstractStream
-from .audio import PyAudioStream, RecordingStream, OutputStream
+from .audio import PyAudioStream, RecordingStream, PlaybackStream
 from .speech_to_text import SpeechToTextStream
 from .text_to_speech import TextToSpeechStream
 from .mitsuku import Mitsuku
@@ -9,7 +9,9 @@ import logging
 
 # Log all messages as white text
 WHITE = "\033[1m"
-logging.basicConfig(level=logging.INFO,
-                    format=WHITE + "%(asctime)s.%(msecs)03d [%(name)s] "
-                                   "%(levelname)s: %(message)s",
-                    datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format=WHITE + "%(asctime)s.%(msecs)03d [%(name)s] "
+                   "%(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)

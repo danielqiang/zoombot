@@ -16,7 +16,7 @@ def sequence_diff(s1: str, s2: str):
     from string import punctuation
 
     # remove punctuation, casing and leading/trailing whitespace
-    trans_table = str.maketrans('', '', punctuation)
+    trans_table = str.maketrans("", "", punctuation)
     s1 = s1.translate(trans_table).lower().strip()
     s2 = s2.translate(trans_table).lower().strip()
 
@@ -35,8 +35,8 @@ def talk():
         )
         mitsuku = stack.enter_context(Mitsuku())
 
-        print('ZoomBot initialized. Ready to go!')
-        print('=' * 40)
+        print("ZoomBot initialized. Ready to go!")
+        print("=" * 40)
 
         for message in stt_stream:
             print(f'Daniel: {fill(message, subsequent_indent=" " * 8)}')
@@ -47,27 +47,25 @@ def talk():
 
 def zoom():
     with ExitStack() as stack:
-        vb_cable_input = 'CABLE Input (VB-Audio Virtual C'
-        vb_cable_output = 'CABLE Output (VB-Audio Virtual '
+        vb_cable_input = "CABLE Input (VB-Audio Virtual C"
+        vb_cable_output = "CABLE Output (VB-Audio Virtual "
 
         stt_stream = stack.enter_context(
-            SpeechToTextStream(
-                device=vb_cable_output
-            )
+            SpeechToTextStream(device=vb_cable_output)
         )
         tts_stream = stack.enter_context(
             TextToSpeechStream(
                 device=vb_cable_input,
                 language_code=VOICE.language_code,
-                voice_name=VOICE.name
+                voice_name=VOICE.name,
             )
         )
         mitsuku = stack.enter_context(Mitsuku())
 
-        print('ZoomBot initialized. Ready to go!')
-        print('=' * 40)
+        print("ZoomBot initialized. Ready to go!")
+        print("=" * 40)
 
-        prev_response = ''
+        prev_response = ""
         for message in stt_stream:
             # ZoomBot currently echos when using VB Cable. If the message
             # is too similar to the previous response, assume it is an echo
@@ -86,5 +84,5 @@ def main():
     # zoom()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
