@@ -1,67 +1,16 @@
-import pyaudio
-import threading
 import logging
 
 from google.cloud import speech
 from google.cloud.speech import types
 from google.api_core.exceptions import GoogleAPIError
 
-from typing import Generator, Any, List
-from .bases import AbstractStream, PyAudioStream
+from typing import Generator, Any
+from .bases import AbstractStream
+from .audio import RecordingStream
 from .consts import DEFAULT_ENCODING_STT, DEFAULT_RATE
 
-__all__ = ['RecordingStream', 'SpeechToTextStream']
+__all__ = ['SpeechToTextStream']
 logger = logging.getLogger(__name__)
-
-
-class RecordingStream(PyAudioStream):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Thread-safe buffer
-        self._buffer = []
-        self._mutex = threading.Lock()
-        self._has_data = threading.Event()
-
-    def default_device(self) -> str:
-        return self._pa.get_default_input_device_info()['name']
-
-    def available_devices(self) -> List[dict]:
-        return [device for device in self._all_devices()
-                if device['maxInputChannels'] > 0 and
-                device['defaultSampleRate'] == self.sample_rate]
-
-    @property
-    def stream(self) -> Generator[bytes, Any, None]:
-        return super().stream
-
-    def _write_buffer(self, in_data, frame_count, time_info, status_flags):
-        with self._mutex:
-            self._buffer.append(in_data)
-            self._has_data.set()
-        return None, pyaudio.paContinue
-
-    def _start_stream(self) -> Generator[bytes, Any, None]:
-        if self._pa_stream is None:
-            self.open()
-        while self.is_open:
-            self._has_data.wait()
-            with self._mutex:
-                data = self._buffer
-                self._buffer = []
-                self._has_data.clear()
-            yield b''.join(data)
-
-    def _open_pa_stream(self):
-        self._pa_stream = self._pa.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=self.rate,
-            input=True,
-            input_device_index=self._device_idx,
-            frames_per_buffer=self.chunk,
-            stream_callback=self._write_buffer
-        )
 
 
 class SpeechToTextStream(AbstractStream):
@@ -106,8 +55,7 @@ class SpeechToTextStream(AbstractStream):
 
 
 def main():
-    AIRPODS = 'Headset (Daniel’s AirPods Hands-Free AG Audio)'
-    with SpeechToTextStream(device=AIRPODS) as stream:
+    with SpeechToTextStream() as stream:
         for transcript in stream:
             print(transcript)
 

@@ -1,53 +1,11 @@
-import pyaudio
-
 from google.cloud import texttospeech as tts
 
-from typing import Generator, List, Optional
-from .bases import AbstractStream, PyAudioStream
+from typing import Generator, Optional
+from .bases import AbstractStream
+from .audio import OutputStream
 from .consts import DEFAULT_ENCODING_TTS
 
-__all__ = ['OutputStream', 'TextToSpeechStream']
-
-
-class OutputStream(PyAudioStream):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # prime output generator
-        self.stream.send(None)
-
-    def default_device(self) -> str:
-        return self._pa.get_default_output_device_info()['name']
-
-    def available_devices(self) -> List[dict]:
-        return [device for device in self._all_devices()
-                if device['maxOutputChannels'] > 0 and
-                device['defaultSampleRate'] == self.sample_rate]
-
-    @property
-    def stream(self) -> Generator[None, Optional[bytes], None]:
-        return super().stream
-
-    def _start_stream(self) -> Generator[None, Optional[bytes], None]:
-        if self._pa_stream is None:
-            self.open()
-        while self.is_open:
-            data = yield
-            self._pa_stream.write(data)
-
-    def _open_pa_stream(self):
-        self._pa_stream = self._pa.open(
-            format=pyaudio.paInt16,
-            channels=1,
-            rate=self.rate,
-            output=True,
-            output_device_index=self._device_idx,
-            frames_per_buffer=self.chunk
-        )
-
-    def write(self, data: bytes):
-        self.stream.send(data)
+__all__ = ['TextToSpeechStream']
 
 
 class TextToSpeechStream(AbstractStream):

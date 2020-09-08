@@ -1,17 +1,29 @@
 from zoombot.speech_to_text import SpeechToTextStream
 from zoombot.text_to_speech import TextToSpeechStream
 from zoombot.mitsuku import Mitsuku
-from zoombot.enums import Voices
+from zoombot.consts import Voices
 
 from contextlib import ExitStack
 from textwrap import fill
-from difflib import SequenceMatcher
+
+
+def sequence_diff(s1: str, s2: str):
+    from difflib import SequenceMatcher
+    from string import punctuation
+
+    # remove punctuation, casing and leading/trailing whitespace
+    trans_table = str.maketrans('', '', punctuation)
+    s1 = s1.lower().strip().translate(trans_table)
+    s2 = s2.lower().strip().translate(trans_table)
+
+    similarity = SequenceMatcher(None, s1, s2).ratio()
+    return similarity
 
 
 def main():
     with ExitStack() as stack:
         # Female WaveNet, en-US
-        voice = Voices.WaveNet.EN_US_WAVENET_H.value
+        voice = Voices.WaveNet.EN_US_WAVENET_H
 
         vb_cable_input = 'CABLE Input (VB-Audio Virtual C'
         vb_cable_output = 'CABLE Output (VB-Audio Virtual '
@@ -38,8 +50,7 @@ def main():
             # ZoomBot currently echos when using VB Cable. If the message
             # is too similar to the previous response, assume it is an echo
             # and skip it.
-            similarity = SequenceMatcher(None, prev_response, message).ratio()
-            if similarity > 0.9:
+            if sequence_diff(prev_response, message) > 0.85:
                 continue
             print(f'Daniel: {fill(message, subsequent_indent=" " * 8)}')
             response = mitsuku.send(message)
