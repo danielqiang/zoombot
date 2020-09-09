@@ -131,3 +131,5 @@ dmypy.json
 # local files
 test*
 .idea/
+record.py
+voice_samples/

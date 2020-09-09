@@ -3,8 +3,12 @@ import threading
 
 from abc import abstractmethod
 from typing import Generator, List
-from .consts import DEFAULT_RATE, DEFAULT_CHUNK, DEFAULT_SAMPLE_RATE
 from .bases import AbstractStream
+from .consts import (
+    DEFAULT_RATE,
+    DEFAULT_CHUNK,
+    DEFAULT_SAMPLE_RATE
+)
 
 __all__ = ["PyAudioStream", "RecordingStream", "PlaybackStream"]
 
