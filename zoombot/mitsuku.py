@@ -2,8 +2,8 @@ import logging
 import requests
 import bs4
 
-from requests import RequestException
 from json import JSONDecodeError
+from requests import RequestException
 from . import retry
 
 __all__ = ["Mitsuku"]
