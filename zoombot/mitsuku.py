@@ -2,6 +2,8 @@ import logging
 import requests
 import bs4
 
+from requests import RequestException
+from json import JSONDecodeError
 from . import retry
 
 __all__ = ["Mitsuku"]
@@ -39,7 +41,8 @@ class Mitsuku:
         return name
 
     @retry.on_exception(
-        requests.exceptions.RequestException, max_retries=3, logger=logger
+        (RequestException, JSONDecodeError),
+        max_retries=3, logger=logger
     )
     def _send(self, message: str, session_id: int = None) -> dict:
         form_data = {
@@ -58,10 +61,11 @@ class Mitsuku:
         return resp.json()
 
     def send(self, message: str):
-        response = self._send(message, self.session_id)["responses"][0]
+        resp_data = self._send(message, self.session_id)
+        response = resp_data["responses"][0]
         soup = bs4.BeautifulSoup(response, "html.parser")
 
-        # Extract text, ignore images
+        # Remove images/links from response
         parts = [s for s in soup.text.split()
                  if not s.startswith("http")]
         return " ".join(parts)
