@@ -12,7 +12,7 @@ from .consts import (
     DEFAULT_ENCODING_STT,
     DEFAULT_RATE,
     DEFAULT_ENCODING_TTS,
-    Voices,
+    Voices
 )
 
 __all__ = ["SpeechToTextStream", "TextToSpeechStream"]
@@ -25,8 +25,8 @@ class SpeechToTextStream(AbstractStream):
         input_device: str = None,
         encoding: int = DEFAULT_ENCODING_STT,
         rate: int = DEFAULT_RATE,
-        interim_results=False,
-        language_code="en-US",
+        interim_results: str = False,
+        language_code: str = "en-US",
         punctuation: bool = True,
         *args,
         **kwargs

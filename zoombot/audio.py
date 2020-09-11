@@ -96,12 +96,6 @@ class RecordingStream(PyAudioStream):
     def stream(self) -> Generator[bytes, None, None]:
         return super().stream
 
-    def _write_buffer(self, in_data, frame_count, time_info, status_flags):
-        with self._mutex:
-            self._buffer.append(in_data)
-            self._has_data.set()
-        return None, pyaudio.paContinue
-
     def _start_stream(self) -> Generator[bytes, None, None]:
         if self._pa_stream is None:
             self.open()
@@ -112,6 +106,12 @@ class RecordingStream(PyAudioStream):
                 self._buffer = []
                 self._has_data.clear()
             yield b"".join(data)
+
+    def _write_buffer(self, in_data, frame_count, time_info, status_flags):
+        with self._mutex:
+            self._buffer.append(in_data)
+            self._has_data.set()
+        return None, pyaudio.paContinue
 
     def _open_pa_stream(self):
         self._pa_stream = self._pa.open(
@@ -160,7 +160,7 @@ class PlaybackStream(PyAudioStream):
             rate=self.rate,
             output=True,
             output_device_index=self._device_idx,
-            frames_per_buffer=self.chunk,
+            frames_per_buffer=self.chunk
         )
 
     def write(self, data: bytes):

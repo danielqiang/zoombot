@@ -5,14 +5,16 @@ from zoombot.consts import Voices
 from contextlib import ExitStack
 from textwrap import fill
 
+VOICE = Voices.WaveNet.CMN_CN_WAVENET_B
+
 
 def talk():
     with ExitStack() as stack:
         stt_stream = stack.enter_context(SpeechToTextStream())
         tts_stream = stack.enter_context(
             TextToSpeechStream(
-                language_code=Voices.DEFAULT.language_code,
-                voice_name=Voices.DEFAULT.name
+                language_code=VOICE.language_code,
+                voice_name=VOICE.name
             )
         )
         mitsuku = stack.enter_context(Mitsuku())
@@ -42,17 +44,18 @@ def _sequence_diff(s1: str, s2: str):
 
 def zoom():
     with ExitStack() as stack:
-        vb_cable_input = "CABLE Input (VB-Audio Virtual C"
-        vb_cable_output = "CABLE Output (VB-Audio Virtual "
+        vb_cable_input = "CABLE Input (VB-Audio Virtual C"  # speaker
+        vb_cable_output = "CABLE Output (VB-Audio Virtual "  # mic
 
         stt_stream = stack.enter_context(
+            # TODO: input device should be output of speaker, not mic
             SpeechToTextStream(input_device=vb_cable_output)
         )
         tts_stream = stack.enter_context(
             TextToSpeechStream(
                 output_device=vb_cable_input,
-                language_code=Voices.DEFAULT.language_code,
-                voice_name=Voices.DEFAULT.name,
+                language_code=VOICE.language_code,
+                voice_name=VOICE.name,
             )
         )
         mitsuku = stack.enter_context(Mitsuku())
