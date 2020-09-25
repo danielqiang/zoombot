@@ -6,12 +6,12 @@ from google.cloud.speech import types
 from google.api_core.exceptions import GoogleAPIError
 
 from typing import Generator
-from .bases import AbstractStream
+from .bases import InputStream, OutputStream
 from .audio import RecordingStream, PlaybackStream
 from .consts import (
     DEFAULT_ENCODING_STT,
-    DEFAULT_RATE,
     DEFAULT_ENCODING_TTS,
+    DEFAULT_RATE,
     Voices
 )
 
@@ -19,7 +19,7 @@ __all__ = ["SpeechToTextStream", "TextToSpeechStream"]
 logger = logging.getLogger(__name__)
 
 
-class SpeechToTextStream(AbstractStream):
+class SpeechToTextStream(InputStream):
     def __init__(
         self,
         input_device: str = None,
@@ -72,7 +72,7 @@ class SpeechToTextStream(AbstractStream):
                 logger.error(e)
 
 
-class TextToSpeechStream(AbstractStream):
+class TextToSpeechStream(OutputStream):
     def __init__(
         self,
         output_device: str = None,
@@ -112,9 +112,6 @@ class TextToSpeechStream(AbstractStream):
                 audio_config=self._audio_config,
             )
             self._output_stream.write(response.audio_content)
-
-    def write(self, message: str):
-        self.stream.send(message)
 
 
 def main():

@@ -3,7 +3,11 @@ import threading
 
 from abc import abstractmethod
 from typing import Generator, List
-from .bases import AbstractStream
+from .bases import (
+    AbstractStream,
+    InputStreamMixin,
+    OutputStreamMixin
+)
 from .consts import (
     DEFAULT_RATE,
     DEFAULT_CHUNK,
@@ -72,7 +76,7 @@ class PyAudioStream(AbstractStream):
         self._pa.terminate()
 
 
-class RecordingStream(PyAudioStream):
+class RecordingStream(PyAudioStream, InputStreamMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -125,7 +129,7 @@ class RecordingStream(PyAudioStream):
         )
 
 
-class PlaybackStream(PyAudioStream):
+class PlaybackStream(PyAudioStream, OutputStreamMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -162,6 +166,3 @@ class PlaybackStream(PyAudioStream):
             output_device_index=self._device_idx,
             frames_per_buffer=self.chunk
         )
-
-    def write(self, data: bytes):
-        self.stream.send(data)

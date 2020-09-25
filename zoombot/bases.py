@@ -1,7 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Generator, Any
 
-__all__ = ["AbstractStream"]
+__all__ = [
+    "AbstractStream",
+    "InputStreamMixin",
+    "OutputStreamMixin",
+    "InputStream",
+    "OutputStream",
+]
 
 
 class AbstractStream(ABC):
@@ -30,8 +36,27 @@ class AbstractStream(ABC):
     def __exit__(self, *args):
         self.close()
 
+
+class InputStreamMixin:
+    stream: Generator[Any, None, None]
+
     def __iter__(self):
         return self
 
     def __next__(self):
         return next(self.stream)
+
+
+class OutputStreamMixin:
+    stream: Generator[None, Any, None]
+
+    def write(self, data):
+        self.stream.send(data)
+
+
+class InputStream(AbstractStream, InputStreamMixin):
+    pass
+
+
+class OutputStream(AbstractStream, OutputStreamMixin):
+    pass

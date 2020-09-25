@@ -5,7 +5,7 @@ from zoombot.consts import Voices
 from contextlib import ExitStack
 from textwrap import fill
 
-VOICE = Voices.WaveNet.CMN_CN_WAVENET_B
+VOICE = Voices.DEFAULT
 
 
 def talk():
