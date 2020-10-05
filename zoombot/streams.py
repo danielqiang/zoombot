@@ -12,7 +12,7 @@ from .consts import (
     DEFAULT_ENCODING_STT,
     DEFAULT_ENCODING_TTS,
     DEFAULT_RATE,
-    Voices
+    Voices,
 )
 
 __all__ = ["SpeechToTextStream", "TextToSpeechStream"]
@@ -103,9 +103,7 @@ class TextToSpeechStream(OutputStream):
     def _start_stream(self) -> Generator[None, str, None]:
         while True:
             message = yield
-            synthesis_input = tts.SynthesisInput(
-                {"text": message}
-            )
+            synthesis_input = tts.SynthesisInput({"text": message})
             response = self._client.synthesize_speech(
                 input=synthesis_input,
                 voice=self._voice,

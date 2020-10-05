@@ -3,16 +3,8 @@ import threading
 
 from abc import abstractmethod
 from typing import Generator, List
-from .bases import (
-    AbstractStream,
-    InputStreamMixin,
-    OutputStreamMixin
-)
-from .consts import (
-    DEFAULT_RATE,
-    DEFAULT_CHUNK,
-    DEFAULT_SAMPLE_RATE
-)
+from .bases import AbstractStream, InputStreamMixin, OutputStreamMixin
+from .consts import DEFAULT_RATE, DEFAULT_CHUNK, DEFAULT_SAMPLE_RATE
 
 __all__ = ["PyAudioStream", "RecordingStream", "PlaybackStream"]
 
@@ -35,8 +27,10 @@ class PyAudioStream(AbstractStream):
 
         self.is_open = False
 
-        devices = {device["name"]: device
-                   for device in self.available_devices()}
+        devices = {
+            device["name"]: device
+            for device in self.available_devices()
+        }
         if (device is not None) and device not in devices:
             raise ValueError(f"Could not find device: {device}")
         self.device = device or self.default_device()
@@ -111,7 +105,9 @@ class RecordingStream(PyAudioStream, InputStreamMixin):
                 self._has_data.clear()
             yield b"".join(data)
 
-    def _write_buffer(self, in_data, frame_count, time_info, status_flags):
+    def _write_buffer(
+        self, in_data, frame_count, time_info, status_flags
+    ):
         with self._mutex:
             self._buffer.append(in_data)
             self._has_data.set()
@@ -164,5 +160,5 @@ class PlaybackStream(PyAudioStream, OutputStreamMixin):
             rate=self.rate,
             output=True,
             output_device_index=self._device_idx,
-            frames_per_buffer=self.chunk
+            frames_per_buffer=self.chunk,
         )
