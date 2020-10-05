@@ -1,10 +1,9 @@
 import logging
 import requests
-import bs4
 
 from json import JSONDecodeError
 from requests import RequestException
-from . import retry
+from zoombot import retry
 
 __all__ = ["Mitsuku"]
 logger = logging.getLogger(__name__)
@@ -33,6 +32,10 @@ class Mitsuku:
         self.session.close()
 
     @staticmethod
+    def _to_extended_ascii(s: str):
+        return "".join(c for c in s if ord(c) < 256)
+
+    @staticmethod
     def _gen_client_name():
         import time
 
@@ -42,7 +45,8 @@ class Mitsuku:
 
     @retry.on_exception(
         (RequestException, JSONDecodeError),
-        max_retries=3, logger=logger
+        max_retries=3,
+        logger=logger,
     )
     def _send(self, message: str, session_id: int = None) -> dict:
         form_data = {
@@ -54,26 +58,35 @@ class Mitsuku:
         }
         headers = {"Referer": "https://www.pandorabots.com/mitsuku/"}
         resp = self.session.post(
-            self._ENDPOINT,
-            headers=headers,
-            data=form_data
+            self._ENDPOINT, headers=headers, data=form_data
         )
         return resp.json()
 
-    def send(self, message: str):
+    def send(
+        self,
+        message: str,
+        remove_images: bool = True,
+        force_ascii_response: bool = True,
+    ):
         resp_data = self._send(message, self.session_id)
         response = resp_data["responses"][0]
-        soup = bs4.BeautifulSoup(response, "html.parser")
 
-        # Remove images/links from response
-        parts = [s for s in soup.text.split()
-                 if not s.startswith("http")]
-        return " ".join(parts)
+        if remove_images:
+            import re
+
+            pattern = re.compile(r'<image>.*?</image>')
+            response = pattern.sub('', response)
+
+        if force_ascii_response:
+            response = self._to_extended_ascii(response)
+        return response
 
 
 def main():
     with Mitsuku() as mitsuku:
-        resp = mitsuku.send("Wow thank you")
+        resp = mitsuku.send(
+            "What is the weather like today in Seattle?"
+        )
         print(resp)
 
 
