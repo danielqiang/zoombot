@@ -48,10 +48,8 @@ def talk():
         print("=" * 40)
 
         for message in stt_stream:
-            # print(f'Daniel: {fill(message, subsequent_indent=" " * 8)}')
             print(_format_message(USERNAME, message))
             response = mitsuku.send(message)
-            # print(f'ZoomBot: {fill(response, subsequent_indent=" " * 9)}')
             print(_format_message(BOTNAME, response))
             tts_stream.write(response)
 

@@ -67,15 +67,15 @@ class Mitsuku:
         message: str,
         remove_images: bool = True,
         force_ascii_response: bool = True,
-    ):
+    ) -> str:
         resp_data = self._send(message, self.session_id)
         response = resp_data["responses"][0]
 
         if remove_images:
             import re
 
-            pattern = re.compile(r'<image>.*?</image>')
-            response = pattern.sub('', response)
+            pattern = re.compile(r"<image>.*?</image>")
+            response = pattern.sub("", response)
 
         if force_ascii_response:
             response = self._to_extended_ascii(response)
