@@ -2,7 +2,11 @@ import logging
 
 from google.cloud import speech
 from google.cloud import texttospeech as tts
-from google.cloud.speech import types
+from google.cloud.speech import (
+    RecognitionConfig,
+    StreamingRecognitionConfig,
+    StreamingRecognizeRequest,
+)
 from google.api_core.exceptions import GoogleAPIError
 
 from typing import Generator
@@ -36,13 +40,13 @@ class SpeechToTextStream(InputStream):
         )
         self._client = speech.SpeechClient()
 
-        recognition_config = types.RecognitionConfig(
+        recognition_config = RecognitionConfig(
             encoding=encoding,
             sample_rate_hertz=rate,
             language_code=language_code,
             enable_automatic_punctuation=punctuation,
         )
-        stream_config = types.StreamingRecognitionConfig(
+        stream_config = StreamingRecognitionConfig(
             config=recognition_config,
             interim_results=interim_results,
         )
@@ -54,7 +58,7 @@ class SpeechToTextStream(InputStream):
 
     def _start_stream(self) -> Generator[str, None, None]:
         requests = (
-            types.StreamingRecognizeRequest(audio_content=data)
+            StreamingRecognizeRequest(audio_content=data)
             for data in self._input_stream
         )
         stream = self._client.streaming_recognize(
