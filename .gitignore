@@ -129,7 +129,8 @@ dmypy.json
 .pyre/
 
 # local files
-test*
+/test*.py
+*.wav
 .idea/
 record.py
 voice_samples/
