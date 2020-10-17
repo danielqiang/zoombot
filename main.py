@@ -95,6 +95,9 @@ def zoom():
             # and skip it.
             if _sequence_diff(prev_response, message) > 0.85:
                 continue
+
+            # Process voice command here
+            # make API call to spotify/youtube, get response
             print(_format_message(USERNAME, message))
             response = mitsuku.send(message)
             prev_response = response

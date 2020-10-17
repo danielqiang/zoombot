@@ -7,7 +7,7 @@ with state-of-the-art chatbot [Mitsuku](https://www.pandorabots.com/mitsuku/)
 (5-time winner of the Loebner Prize Turing Test). Written
 in pure Python!
 
-Requires Python 3.7 or later.
+Requires Python 3.8.
 
 ## Dependencies
 ### Python

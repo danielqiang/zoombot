@@ -4,7 +4,7 @@ import threading
 from abc import abstractmethod
 from typing import Generator, List
 from .bases import AbstractStream, InputStreamMixin, OutputStreamMixin
-from .consts import DEFAULT_RATE, DEFAULT_CHUNK, DEFAULT_SAMPLE_RATE
+from .consts import DEFAULT_RATE, DEFAULT_CHUNK
 
 __all__ = ["PyAudioStream", "RecordingStream", "PlaybackStream"]
 
@@ -14,7 +14,7 @@ class PyAudioStream(AbstractStream):
         self,
         rate: int = DEFAULT_RATE,
         chunk: int = DEFAULT_CHUNK,
-        sample_rate: int = DEFAULT_SAMPLE_RATE,
+        sample_rate: int = None,
         device: str = None,
     ):
         self.rate = rate
@@ -34,6 +34,9 @@ class PyAudioStream(AbstractStream):
         if (device is not None) and device not in devices:
             raise ValueError(f"Could not find device: {device}")
         self.device = device or self.default_device()
+
+        print(list(self._all_devices()))
+        print(devices)
         self.device_info = devices[self.device]
         self._device_idx = devices[self.device]["index"]
 
@@ -87,7 +90,7 @@ class RecordingStream(PyAudioStream, InputStreamMixin):
             device
             for device in self._all_devices()
             if device["maxInputChannels"] > 0
-            and device["defaultSampleRate"] == self.sample_rate
+            and self.sample_rate in (device["defaultSampleRate"], None)
         ]
 
     @property
@@ -139,7 +142,7 @@ class PlaybackStream(PyAudioStream, OutputStreamMixin):
             device
             for device in self._all_devices()
             if device["maxOutputChannels"] > 0
-            and device["defaultSampleRate"] == self.sample_rate
+            and self.sample_rate in (device["defaultSampleRate"], None)
         ]
 
     @property
