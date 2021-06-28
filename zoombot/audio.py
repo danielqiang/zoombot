@@ -35,8 +35,6 @@ class PyAudioStream(AbstractStream):
             raise ValueError(f"Could not find device: {device}")
         self.device = device or self.default_device()
 
-        print(list(self._all_devices()))
-        print(devices)
         self.device_info = devices[self.device]
         self._device_idx = devices[self.device]["index"]
 
